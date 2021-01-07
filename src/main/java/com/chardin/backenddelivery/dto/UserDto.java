@@ -3,42 +3,20 @@ package com.chardin.backenddelivery.dto;
 import java.io.Serializable;
 import java.util.List;
 
-import com.chardin.backenddelivery.entity.User;
-
 public class UserDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private long id;
-	private byte avatar;
+	private Long id;
+	private Byte avatar;
 	private String name;
 	private String lastname;
+	private String phone;
 	private String email;
 	private String password;
-	private String phone;
-	private String address;
 	private List<RolDto> rols;
 
 	public UserDto() {
-	}
-
-	public UserDto(User user) {
-		this.id = user.getId();
-		this.avatar = user.getAvatar();
-		this.name = user.getName();
-		this.lastname = user.getLastname();
-		this.email = user.getEmail();
-		this.password = user.getPassword();
-		this.phone = user.getPhone();
-		this.address = user.getAddress();
-		user.getRols().forEach(r -> rols.add(new RolDto(r)));
-	}
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
 	}
 
 	public List<RolDto> getRols() {
@@ -49,16 +27,16 @@ public class UserDto implements Serializable {
 		this.rols = rols;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
-	public byte getAvatar() {
+	public Byte getAvatar() {
 		return avatar;
 	}
-	public void setAvatar(byte avatar) {
+	public void setAvatar(Byte avatar) {
 		this.avatar = avatar;
 	}
 	public String getName() {
@@ -73,6 +51,12 @@ public class UserDto implements Serializable {
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
 	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 	public String getEmail() {
 		return email;
 	}
@@ -84,11 +68,5 @@ public class UserDto implements Serializable {
 	}
 	public void setPassword(String password) {
 		this.password = password;
-	}
-	public String getPhone() {
-		return phone;
-	}
-	public void setPhone(String phone) {
-		this.phone = phone;
 	}
 }

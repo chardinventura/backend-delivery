@@ -1,9 +1,9 @@
-package com.chardin.backenddelivery.controllers;
+package com.chardin.backenddelivery.controller;
 
 import java.util.List;
 
 import com.chardin.backenddelivery.dto.UserDto;
-import com.chardin.backenddelivery.service.UserService;
+import com.chardin.backenddelivery.service.IUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/v1/users")
+@RequestMapping("/v1/users")
 public class UserController {
 
 	@Autowired
-	private UserService userService;
+	private IUserService userService;
 
 	@PostMapping
 	public boolean insert(@RequestBody UserDto userDto) {

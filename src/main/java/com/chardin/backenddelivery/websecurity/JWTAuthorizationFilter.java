@@ -10,7 +10,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +21,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
+
+	private static final Logger LOG = LoggerFactory.getLogger(BasicAuthenticationFilter.class);
 
 	public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
 		super(authenticationManager);
@@ -35,7 +40,14 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 			return;
 		}
 
-		Authentication authentication = getAuthenticationManager(request);
+		Authentication authentication = null;
+
+		try{
+
+			authentication = getAuthenticationManager(request);
+		}catch(TokenExpiredException e) {
+			LOG.error(e.getMessage());
+		}
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -43,7 +55,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 	}
 
 	// Read the JWT from the Authentication header, and then uses JWT to valid the token.
-	private UsernamePasswordAuthenticationToken getAuthenticationManager(HttpServletRequest request) {
+	private UsernamePasswordAuthenticationToken getAuthenticationManager(HttpServletRequest request)
+   			throws TokenExpiredException {
 
 		String token = request.getHeader(SecurityContants.HEADER_NAME);
 

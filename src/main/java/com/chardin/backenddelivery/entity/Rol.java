@@ -1,18 +1,17 @@
 package com.chardin.backenddelivery.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import com.chardin.backenddelivery.dto.RolDto;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "rols")
@@ -23,18 +22,12 @@ public class Rol implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+	@Column(nullable = false)
 	private String name;
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	private User user;
+	@ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+	private List<User> users;
 
 	public Rol() {
-	}
-	public Rol(RolDto rolDto) {
-		this.id = rolDto.getId();
-		this.name = rolDto.getName();
-		this.user = new User(rolDto.getUser());
 	}
 	public long getId() {
 		return id;
@@ -48,10 +41,10 @@ public class Rol implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public User getUser() {
-		return user;
+	public List<User> getUsers() {
+		return users;
 	}
-	public void setUser(User user) {
-		this.user = user;
+	public void setUsers(List<User> users) {
+		this.users = users;
 	}
 }

@@ -1,34 +1,23 @@
 package com.chardin.backenddelivery.dto;
 
 import java.io.Serializable;
-
-import com.chardin.backenddelivery.entity.Rol;
+import java.util.List;
 
 public class RolDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private long id;
+	private Long id;
 	private String name;
-	private UserDto user;
+	private List<UserDto> users;
 
 	public RolDto() {
 	}
-	public RolDto(Rol rol) {
-		this.id = rol.getId();
-		this.name = rol.getName();
-		this.user = new UserDto(rol.getUser());
-	}
-	public UserDto getUser() {
-		return user;
-	}
-	public void setUser(UserDto user) {
-		this.user = user;
-	}
-	public long getId() {
+
+	public Long getId() {
 		return id;
 	}
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -36,5 +25,11 @@ public class RolDto implements Serializable {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public List<UserDto> getUsers() {
+		return users;
+	}
+	public void setUsers(List<UserDto> users) {
+		this.users = users;
 	}
 }
