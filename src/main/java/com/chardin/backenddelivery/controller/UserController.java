@@ -1,20 +1,15 @@
 package com.chardin.backenddelivery.controller;
 
-import java.util.List;
-
 import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.service.IUserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -24,22 +19,22 @@ public class UserController {
 	private IUserService userService;
 
 	@PostMapping
-	public boolean insert(@RequestBody UserDto userDto) {
+	public UserDto insert(@Valid @RequestBody UserDto userDto) {
 		return userService.insert(userDto);
 	}
 
-	@PutMapping
-	public boolean update(@RequestBody UserDto userDto) {
-		return userService.update(userDto);
+	@PutMapping(path = "/{id}")
+	public ResponseEntity update(@PathVariable(value = "id") Long id, @Valid @RequestBody UserDto userDto) {
+		return userService.update(id, userDto);
 	}
 
 	@DeleteMapping(path = "/{id}")
-	public boolean update(@PathVariable("id") Long id) {
+	public Map<String, Boolean> delete(@PathVariable("id") Long id) {
 		return userService.delete(id);
 	}
 
 	@GetMapping(path = "/{id}")
-	public UserDto getById(@PathVariable("id") Long id) {
+	public ResponseEntity getById(@PathVariable("id") Long id) {
 		return userService.getById(id);
 	}
 

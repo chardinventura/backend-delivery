@@ -1,22 +1,26 @@
 package com.chardin.backenddelivery.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.chardin.backenddelivery.converter.DtoEntity;
 import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.entity.User;
+import com.chardin.backenddelivery.exception.ResourceNotFoundException;
 import com.chardin.backenddelivery.repository.UserRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService implements IUserService {
@@ -31,80 +35,71 @@ public class UserService implements IUserService {
 	private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		User user = userRepository.findByEmail(email);
+		User user = userRepository.findByUsername(username);
 
-		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), new ArrayList<>());
+		List<GrantedAuthority> authorities = user.getAuthorities()
+				.stream().map(a -> new SimpleGrantedAuthority(a.getName())).collect(Collectors.toList());
+
+		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
 	}
 
 	@Override
-	public boolean insert(UserDto userDto) {
+	public UserDto insert(UserDto userDto) {
 
-		try {
-			userDto.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
-			userRepository.save(dtoEntity.getUser(userDto));
-			return true;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return false;
-		}
+		userDto.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
+
+		userRepository.save(dtoEntity.getUser(userDto));
+
+		return userDto;
 	}
 
 	@Override
-	public boolean update(UserDto userDto) {
+	public ResponseEntity update(Long id, UserDto userDto) throws RuntimeException {
 
-		try {
+		User user = userRepository.findById(id)
+				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
 
-			if(!userRepository.findById(userDto.getId()).get().getPassword().equals(userDto.getPassword()))
-				userDto.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
+		userDto.setId(id);
 
-			userRepository.save(dtoEntity.getUser(userDto));
-			return true;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return false;
-		}
+		userRepository.save(dtoEntity.getUser(userDto));
+
+		return ResponseEntity.ok(userDto);
 	}
 
 	@Override
-	public boolean delete(Long id) {
+	public Map<String, Boolean> delete(Long id)  {
 
-		try {
+		User user = userRepository.findById(id)
+				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
 
-			userRepository.deleteById(id);
-			return true;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return false;
-		}
+		userRepository.delete(user);
+
+		Map<String, Boolean> response = new HashMap<>();
+		response.put("deleted", Boolean.TRUE);
+
+		return response;
 	}
 
 	@Override
-	public UserDto getById(Long id) {
+	public ResponseEntity getById(Long id) throws RuntimeException {
 
-		try {
-			UserDto userDto = dtoEntity.getUserDto(userRepository.getOne(id));
+		User user = userRepository.findById(id)
+				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
 
-			userDto.getRols().forEach(r -> r.getUsers().clear());
-
-			return userDto;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return null;
-		}
+		return ResponseEntity.ok(dtoEntity.getUserDto(user));
 	}
 
 	@Override
 	public List<UserDto> getAll(Pageable pageable) {
 
 		try {
-
-		List<User> users = userRepository.findAll(pageable).getContent();
-
-		List<UserDto> usersDto = users.stream().map(u -> dtoEntity.getUserDto(u)).collect(Collectors.toList());
-		usersDto.forEach(ud ->
-				ud.getRols().forEach(r -> r.getUsers().clear()));
+			List<UserDto> usersDto = userRepository.findAll(pageable)
+					.getContent()
+					.stream()
+					.map(u -> dtoEntity.getUserDto(u))
+					.collect(Collectors.toList());
 
 			return usersDto;
 		}catch(IllegalArgumentException e) {
