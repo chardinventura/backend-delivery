@@ -1,17 +1,17 @@
 package com.chardin.backenddelivery.dto;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.List;
 
-public class RolDto implements Serializable {
+public class AuthorityDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	@NotBlank
 	private String name;
-	private List<UserDto> users;
 
-	public RolDto() {
+	public AuthorityDto() {
 	}
 
 	public Long getId() {
@@ -25,11 +25,5 @@ public class RolDto implements Serializable {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public List<UserDto> getUsers() {
-		return users;
-	}
-	public void setUsers(List<UserDto> users) {
-		this.users = users;
 	}
 }

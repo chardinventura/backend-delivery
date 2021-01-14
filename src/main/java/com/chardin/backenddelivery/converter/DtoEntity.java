@@ -3,9 +3,9 @@ package com.chardin.backenddelivery.converter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.chardin.backenddelivery.dto.RolDto;
+import com.chardin.backenddelivery.dto.AuthorityDto;
 import com.chardin.backenddelivery.dto.UserDto;
-import com.chardin.backenddelivery.entity.Rol;
+import com.chardin.backenddelivery.entity.Authority;
 import com.chardin.backenddelivery.entity.User;
 
 import org.modelmapper.ModelMapper;
@@ -40,23 +40,23 @@ public class DtoEntity {
 	}
 
 	//Rol-RolDto
-	public RolDto getRolDto(Rol rol) {
+	public AuthorityDto getRolDto(Authority authorities) {
 
-		return rol != null ? modelmapper.map(rol, RolDto.class) : null;
+		return authorities != null ? modelmapper.map(authorities, AuthorityDto.class) : null;
 	}
 
-	public Rol getRol(RolDto rolDto) {
+	public Authority getRol(AuthorityDto authorityDto) {
 
-		return rolDto != null ? modelmapper.map(rolDto, Rol.class) : null;
+		return authorityDto != null ? modelmapper.map(authorityDto, Authority.class) : null;
 	}
 
-	public List<RolDto> getRolsDto(List<Rol> rols) {
+	public List<AuthorityDto> getRolsDto(List<Authority> authorities) {
 
-		return rols.stream().map(r -> modelmapper.map(r, RolDto.class)).collect(Collectors.toList());
+		return authorities.stream().map(r -> modelmapper.map(r, AuthorityDto.class)).collect(Collectors.toList());
 	}
 
-	public List<Rol> getRols(List<RolDto> rolsDto) {
+	public List<Authority> getRols(List<AuthorityDto> rolsDto) {
 
-		return rolsDto.stream().map(r -> modelmapper.map(r, Rol.class)).collect(Collectors.toList());
+		return rolsDto.stream().map(r -> modelmapper.map(r, Authority.class)).collect(Collectors.toList());
 	}
 }

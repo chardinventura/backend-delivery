@@ -2,8 +2,7 @@ package com.chardin.backenddelivery.controller;
 
 import java.util.List;
 
-import com.chardin.backenddelivery.dto.RolDto;
-import com.chardin.backenddelivery.dto.RolDto;
+import com.chardin.backenddelivery.dto.AuthorityDto;
 import com.chardin.backenddelivery.service.IRolService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +24,13 @@ public class RolController {
 	private IRolService rolService;
 
 	@PostMapping
-	public boolean insert(@RequestBody RolDto rolDto) {
-		return rolService.insert(rolDto);
+	public boolean insert(@RequestBody AuthorityDto authorityDto) {
+		return rolService.insert(authorityDto);
 	}
 
 	@PutMapping
-	public boolean update(@RequestBody RolDto rolDto) {
-		return rolService.update(rolDto);
+	public boolean update(@RequestBody AuthorityDto authorityDto) {
+		return rolService.update(authorityDto);
 	}
 
 	@DeleteMapping(path = "/{id}")
@@ -40,12 +39,12 @@ public class RolController {
 	}
 
 	@GetMapping(path = "/{id}")
-	public RolDto getById(@PathVariable("id") Long id) {
+	public AuthorityDto getById(@PathVariable("id") Long id) {
 		return rolService.getById(id);
 	}
 
 	@GetMapping
-	public List<RolDto> getAll(Pageable pageable) {
+	public List<AuthorityDto> getAll(Pageable pageable) {
 		return rolService.getAll(pageable);
 	}
 }
