@@ -3,14 +3,7 @@ package com.chardin.backenddelivery.entity;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -20,29 +13,33 @@ public class User implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	@Column(nullable = false)
 	private byte avatar;
 	@Column(nullable = false)
-	private String name;
+	private String firstname;
 	@Column(nullable = false)
 	private String lastname;
+	@Column(nullable = false, unique = true)
+	private String username;
 	@Column(nullable = false, unique = true)
 	private String phone;
 	@Column(nullable = false, unique = true)
 	private String email;
 	@Column(nullable = false)
 	private String password;
-	@ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
-	private List<Rol> rols;
+	@ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_authorities",
+	joinColumns = @JoinColumn(name = "user_id"),
+	inverseJoinColumns = @JoinColumn(name = "authority_id"))
+	private List<Authority> authorities;
 
 	public User() {
 	}
 
-	public long getId() {
-		return id;
+	public Long getId() { return id;
 	}
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 	public byte getAvatar() {
@@ -51,17 +48,23 @@ public class User implements Serializable {
 	public void setAvatar(byte avatar) {
 		this.avatar = avatar;
 	}
-	public String getName() {
-		return name;
+	public String getFirstname() {
+		return firstname;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
 	}
 	public String getLastname() {
 		return lastname;
 	}
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	public String getPhone() {
 		return phone;
@@ -81,10 +84,10 @@ public class User implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public List<Rol> getRols() {
-		return rols;
+	public List<Authority> getAuthorities() {
+		return authorities;
 	}
-	public void setRols(List<Rol> rols) {
-		this.rols = rols;
+	public void setAuthorities(List<Authority> authorities) {
+		this.authorities = authorities;
 	}
 }

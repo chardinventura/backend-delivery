@@ -1,5 +1,10 @@
 package com.chardin.backenddelivery.dto;
 
+import com.chardin.backenddelivery.validator.Phone;
+import com.chardin.backenddelivery.validator.Username;
+import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -8,23 +13,27 @@ public class UserDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
-	private Byte avatar;
-	private String name;
+    @Range(max = 127)
+	private byte avatar;
+    @NotBlank
+	private String firstname;
+	@NotBlank
 	private String lastname;
+	@NotBlank
+    @Username
+	private String username;
+	@NotBlank
+	@Phone
 	private String phone;
+	@Email
+	@NotBlank
+	@com.chardin.backenddelivery.validator.Email
 	private String email;
+	@Size(min = 8)
 	private String password;
-	private List<RolDto> rols;
+	private List<AuthorityDto> authorities;
 
 	public UserDto() {
-	}
-
-	public List<RolDto> getRols() {
-		return rols;
-	}
-
-	public void setRols(List<RolDto> rols) {
-		this.rols = rols;
 	}
 
 	public Long getId() {
@@ -33,23 +42,29 @@ public class UserDto implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public Byte getAvatar() {
+	public byte getAvatar() {
 		return avatar;
 	}
-	public void setAvatar(Byte avatar) {
+	public void setAvatar(byte avatar) {
 		this.avatar = avatar;
 	}
-	public String getName() {
-		return name;
+	public String getFirstname() {
+		return firstname;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
 	}
 	public String getLastname() {
 		return lastname;
 	}
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
 	}
 	public String getPhone() {
 		return phone;
@@ -68,5 +83,11 @@ public class UserDto implements Serializable {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public List<AuthorityDto> getAuthorities() {
+		return authorities;
+	}
+	public void setAuthorities(List<AuthorityDto> authorities) {
+		this.authorities = authorities;
 	}
 }
