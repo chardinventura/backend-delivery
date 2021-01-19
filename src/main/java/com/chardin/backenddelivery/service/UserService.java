@@ -37,10 +37,13 @@ public class UserService implements IUserService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		User user = userRepository.findByUsername(username);
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User name not found on :: " + username));
 
 		List<GrantedAuthority> authorities = user.getAuthorities()
-				.stream().map(a -> new SimpleGrantedAuthority(a.getName())).collect(Collectors.toList());
+				.stream()
+				.map(a -> new SimpleGrantedAuthority(a.getName()))
+				.collect(Collectors.toList());
 
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
 	}
@@ -60,6 +63,8 @@ public class UserService implements IUserService {
 
 		User user = userRepository.findById(id)
 				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
+
+		    System.out.println(bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword()));
 
 		userDto.setId(id);
 

@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.chardin.backenddelivery.dto.UserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,9 +19,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -64,6 +67,26 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 		response.getWriter().write(body);
 		response.getWriter().flush();
+	}
+
+	@Override
+	protected void unsuccessfulAuthentication(HttpServletRequest request,
+											  HttpServletResponse response,
+											  AuthenticationException failed) throws IOException, ServletException {
+
+		response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+
+		Map<String, Object> body = new HashMap<>();
+		body.put("message", failed.getMessage());
+		body.put("error", "Username or password is incorrect");
+		body.put("timeStamp", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd H:m:s")));
+		body.put("status", HttpStatus.FORBIDDEN);
+
+		PrintWriter out = response.getWriter();
+		out.print(new ObjectMapper().writeValueAsString(body));
+		out.flush();
 	}
 }
 
