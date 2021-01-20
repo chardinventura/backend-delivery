@@ -64,9 +64,11 @@ public class UserService implements IUserService {
 		User user = userRepository.findById(id)
 				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
 
-		    System.out.println(bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword()));
+		String passwordEncoded = bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword()) ?
+				user.getPassword() : bCryptPasswordEncoder.encode(userDto.getPassword());
 
 		userDto.setId(id);
+		userDto.setPassword(passwordEncoded);
 
 		userRepository.save(dtoEntity.getUser(userDto));
 
