@@ -4,14 +4,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.chardin.backenddelivery.dto.UserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -22,8 +19,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -39,16 +38,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
 				UserDto cred = new ObjectMapper().readValue(request.getInputStream(), UserDto.class);
 
-				List<GrantedAuthority> authorities = cred.getAuthorities() == null ?
-						new ArrayList<>() :
-						cred.getAuthorities().stream().map(a -> new SimpleGrantedAuthority(a.getName()))
-								.collect(Collectors.toList());
-
 				return getAuthenticationManager().authenticate(
 						new UsernamePasswordAuthenticationToken(
 							cred.getUsername(),
 							cred.getPassword(),
-							authorities));
+							new ArrayList<>()));
 			}catch(IOException e) {
 				throw new RuntimeException(e);
 			}

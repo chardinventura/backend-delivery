@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 
@@ -18,12 +19,12 @@ public class AuthorityController {
 	private IAuthorityService authorityService;
 
 	@PostMapping
-	public AuthorityDto insert(@RequestBody AuthorityDto authorityDto) {
+	public ResponseEntity insert(@Valid @RequestBody AuthorityDto authorityDto) {
 		return authorityService.insert(authorityDto);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity update(@PathVariable("id") Long id, @RequestBody AuthorityDto authorityDto) {
+	public ResponseEntity update(@PathVariable("id") Long id, @Valid @RequestBody AuthorityDto authorityDto) {
 		return authorityService.update(id, authorityDto);
 	}
 
