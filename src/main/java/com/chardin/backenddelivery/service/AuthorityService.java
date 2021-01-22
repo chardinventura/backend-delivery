@@ -2,18 +2,23 @@ package com.chardin.backenddelivery.service;
 
 import com.chardin.backenddelivery.converter.DtoEntity;
 import com.chardin.backenddelivery.dto.AuthorityDto;
+import com.chardin.backenddelivery.entity.Authority;
+import com.chardin.backenddelivery.exception.ResourceNotFoundException;
 import com.chardin.backenddelivery.repository.AuthorityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class AuthorityService implements IRolService {
+public class AuthorityService implements IAuthorityService {
 
 	@Autowired
 	private AuthorityRepository rolRepository;
@@ -23,68 +28,53 @@ public class AuthorityService implements IRolService {
 	private static final Logger LOG = LoggerFactory.getLogger(AuthorityService.class);
 
 	@Override
-	public boolean insert(AuthorityDto authorityDto) {
+	public AuthorityDto insert(AuthorityDto authorityDto) {
 
-		try {
-			rolRepository.save(dtoEntity.getRol(authorityDto));
-			return true;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return false;
-		}
+		rolRepository.save(dtoEntity.getRol(authorityDto));
+
+		return  authorityDto;
 	}
 
 	@Override
-	public boolean update(AuthorityDto authorityDto) {
+	public ResponseEntity update(Long id, AuthorityDto authorityDto) {
 
-		try {
+		Authority authority = rolRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Authority id not found :: " + id));
 
-			rolRepository.save(dtoEntity.getRol(authorityDto));
-			return true;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return false;
-		}
+		authorityDto.setId(id);
+
+		rolRepository.save(dtoEntity.getRol(authorityDto));
+
+		return ResponseEntity.ok(authorityDto);
 	}
 
 	@Override
-	public boolean delete(Long id) {
+	public Map<String, Boolean> delete(Long id) {
 
-		try {
+		Authority authority = rolRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Authority id not found :: " + id));
 
-			rolRepository.deleteById(id);
-			return true;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return false;
-		}
+		rolRepository.deleteById(id);
+
+		Map<String, Boolean> response = new HashMap<>();
+		response.put("deleted", Boolean.TRUE);
+
+		return response;
 	}
 
 	@Override
-	public AuthorityDto getById(Long id) {
+	public List<AuthorityDto> getByUser_Username(String username) {
 
-		AuthorityDto authorityDto = dtoEntity.getRolDto(rolRepository.findById(id).get());
-
-		try {
-
-			return authorityDto;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return authorityDto;
-		}
+		 return dtoEntity.getRolsDto(rolRepository.findByUsers_Username(username));
 	}
 
 	@Override
 	public List<AuthorityDto> getAll(Pageable pageable) {
 
-		try {
-			List<AuthorityDto> authorities = rolRepository.findAll(pageable).getContent()
-					.stream().map(r -> dtoEntity.getRolDto(r)).collect(Collectors.toList());
-
-			return authorities;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return null;
-		}
+		return rolRepository.findAll(pageable)
+				.getContent()
+				.stream()
+				.map(r -> dtoEntity.getRolDto(r))
+				.collect(Collectors.toList());
 	}
 }

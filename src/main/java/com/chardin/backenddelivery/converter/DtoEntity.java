@@ -1,16 +1,15 @@
 package com.chardin.backenddelivery.converter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.chardin.backenddelivery.dto.AuthorityDto;
 import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.entity.Authority;
 import com.chardin.backenddelivery.entity.User;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class DtoEntity {
@@ -52,11 +51,17 @@ public class DtoEntity {
 
 	public List<AuthorityDto> getRolsDto(List<Authority> authorities) {
 
-		return authorities.stream().map(r -> modelmapper.map(r, AuthorityDto.class)).collect(Collectors.toList());
+		return authorities
+				.stream()
+				.map(r -> modelmapper.map(r, AuthorityDto.class))
+				.collect(Collectors.toList());
 	}
 
 	public List<Authority> getRols(List<AuthorityDto> rolsDto) {
 
-		return rolsDto.stream().map(r -> modelmapper.map(r, Authority.class)).collect(Collectors.toList());
+		return rolsDto
+				.stream()
+				.map(r -> modelmapper.map(r, Authority.class))
+				.collect(Collectors.toList());
 	}
 }

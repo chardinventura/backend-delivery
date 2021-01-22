@@ -4,11 +4,14 @@ import com.chardin.backenddelivery.converter.DtoEntity;
 import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.entity.User;
 import com.chardin.backenddelivery.exception.ResourceNotFoundException;
+import com.chardin.backenddelivery.exception.ValidationResponse;
+import com.chardin.backenddelivery.repository.AuthorityRepository;
 import com.chardin.backenddelivery.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +31,8 @@ public class UserService implements IUserService {
 
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private AuthorityRepository authorityRepository;
 	@Autowired
 	private BCryptPasswordEncoder bCryptPasswordEncoder;
 	@Autowired
@@ -40,7 +46,7 @@ public class UserService implements IUserService {
 		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User name not found on :: " + username));
 
-		List<GrantedAuthority> authorities = user.getAuthorities()
+		List<GrantedAuthority> authorities = authorityRepository.findByUsers_Username(username)
 				.stream()
 				.map(a -> new SimpleGrantedAuthority(a.getName()))
 				.collect(Collectors.toList());
@@ -49,20 +55,26 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public UserDto insert(UserDto userDto) {
+	public ResponseEntity insert(UserDto userDto) {
+
+	    if (userRepository.existsByUsernameOrEmailOrPhone(userDto.getUsername(), userDto.getEmail(), userDto.getPhone()))
+	    	return responseBadPost(userDto);
 
 		userDto.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
 
 		userRepository.save(dtoEntity.getUser(userDto));
 
-		return userDto;
+		return ResponseEntity.ok(userDto);
 	}
 
 	@Override
-	public ResponseEntity update(Long id, UserDto userDto) throws RuntimeException {
+	public ResponseEntity update(Long id, UserDto userDto) {
 
 		User user = userRepository.findById(id)
 				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
+
+		if (!user.getUsername().equals(userDto.getUsername()) || !user.getEmail().equals(userDto.getEmail()) || !user.getPhone().equals(userDto.getPhone()))
+			return responseBadPut(user, userDto);
 
 		String passwordEncoded = bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword()) ?
 				user.getPassword() : bCryptPasswordEncoder.encode(userDto.getPassword());
@@ -90,7 +102,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public ResponseEntity getById(Long id) throws RuntimeException {
+	public ResponseEntity getById(Long id) {
 
 		User user = userRepository.findById(id)
 				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
@@ -101,17 +113,56 @@ public class UserService implements IUserService {
 	@Override
 	public List<UserDto> getAll(Pageable pageable) {
 
-		try {
-			List<UserDto> usersDto = userRepository.findAll(pageable)
-					.getContent()
-					.stream()
-					.map(u -> dtoEntity.getUserDto(u))
-					.collect(Collectors.toList());
+		return  userRepository.findAll(pageable)
+				.getContent()
+				.stream()
+				.map(u -> dtoEntity.getUserDto(u))
+				.collect(Collectors.toList());
+	}
 
-			return usersDto;
-		}catch(IllegalArgumentException e) {
-			LOG.error(e.getMessage());
-			return null;
-		}
+	private ResponseEntity responseBadPost(UserDto userDto){
+
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+
+		ValidationResponse body = new ValidationResponse();
+		body.setMessage(httpStatus.getReasonPhrase());
+		body.setStatus(httpStatus.value());
+		body.setTimeStamp(LocalDateTime.now());
+
+		Map<String, String> errors =  new HashMap<>();
+
+		if (userRepository.existsByUsername(userDto.getUsername()))
+			errors.put("username", "Username already exists");
+		if (userRepository.existsByEmail(userDto.getEmail()))
+			errors.put("email", "Email already exists");
+		if (userRepository.existsByPhone(userDto.getPhone()))
+			errors.put("phone", "Phone already exists");
+
+		body.setErrors(errors);
+
+		return new ResponseEntity(body, httpStatus);
+	}
+
+	private ResponseEntity responseBadPut(User user, UserDto userDto) {
+
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+
+		ValidationResponse body = new ValidationResponse();
+		body.setMessage(httpStatus.getReasonPhrase());
+		body.setStatus(httpStatus.value());
+		body.setTimeStamp(LocalDateTime.now());
+
+		Map<String, String> errors =  new HashMap<>();
+
+		if (!user.getUsername().equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername()))
+			errors.put("username", "Username already exists");
+		if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail()))
+			errors.put("email", "Email already exists");
+		if (!user.getPhone().equals(userDto.getPhone()) && userRepository.existsByPhone(userDto.getPhone()))
+			errors.put("phone", "Phone already exists");
+
+		body.setErrors(errors);
+
+		return new ResponseEntity(body, httpStatus);
 	}
 }

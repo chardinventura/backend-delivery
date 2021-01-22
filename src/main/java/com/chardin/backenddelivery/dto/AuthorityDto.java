@@ -2,6 +2,7 @@ package com.chardin.backenddelivery.dto;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
+import java.util.List;
 
 public class AuthorityDto implements Serializable {
 
@@ -10,6 +11,7 @@ public class AuthorityDto implements Serializable {
 	private Long id;
 	@NotBlank
 	private String name;
+	private List<UserDto> users;
 
 	public AuthorityDto() {
 	}
@@ -25,5 +27,11 @@ public class AuthorityDto implements Serializable {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public List<UserDto> getUsers() {
+		return users;
+	}
+	public void setUsers(List<UserDto> users) {
+		this.users = users;
 	}
 }

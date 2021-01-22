@@ -1,12 +1,11 @@
 package com.chardin.backenddelivery.dto;
 
-import com.chardin.backenddelivery.validator.Phone;
-import com.chardin.backenddelivery.validator.Username;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.List;
 
 public class UserDto implements Serializable {
 
@@ -20,18 +19,14 @@ public class UserDto implements Serializable {
 	@NotBlank
 	private String lastname;
 	@NotBlank
-    @Username
 	private String username;
 	@NotBlank
-	@Phone
 	private String phone;
 	@Email
 	@NotBlank
-	@com.chardin.backenddelivery.validator.Email
 	private String email;
 	@Size(min = 8)
 	private String password;
-	private List<AuthorityDto> authorities;
 
 	public UserDto() {
 	}
@@ -83,11 +78,5 @@ public class UserDto implements Serializable {
 	}
 	public void setPassword(String password) {
 		this.password = password;
-	}
-	public List<AuthorityDto> getAuthorities() {
-		return authorities;
-	}
-	public void setAuthorities(List<AuthorityDto> authorities) {
-		this.authorities = authorities;
 	}
 }

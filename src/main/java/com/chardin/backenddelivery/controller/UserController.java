@@ -19,12 +19,12 @@ public class UserController {
 	private IUserService userService;
 
 	@PostMapping
-	public UserDto insert(@Valid @RequestBody UserDto userDto) {
+	public ResponseEntity insert(@Valid @RequestBody UserDto userDto) {
 		return userService.insert(userDto);
 	}
 
 	@PutMapping(path = "/{id}")
-	public ResponseEntity update(@PathVariable(value = "id") Long id, @RequestBody UserDto userDto) {
+	public ResponseEntity update(@Valid @PathVariable("id") Long id, @RequestBody UserDto userDto) {
 		return userService.update(id, userDto);
 	}
 

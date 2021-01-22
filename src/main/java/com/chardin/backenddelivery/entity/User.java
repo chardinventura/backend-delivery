@@ -1,9 +1,7 @@
 package com.chardin.backenddelivery.entity;
 
-import java.io.Serializable;
-import java.util.List;
-
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "users")
@@ -28,11 +26,6 @@ public class User implements Serializable {
 	private String email;
 	@Column(nullable = false)
 	private String password;
-	@ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "users_authorities",
-	joinColumns = @JoinColumn(name = "user_id"),
-	inverseJoinColumns = @JoinColumn(name = "authority_id"))
-	private List<Authority> authorities;
 
 	public User() {
 	}
@@ -83,11 +76,5 @@ public class User implements Serializable {
 	}
 	public void setPassword(String password) {
 		this.password = password;
-	}
-	public List<Authority> getAuthorities() {
-		return authorities;
-	}
-	public void setAuthorities(List<Authority> authorities) {
-		this.authorities = authorities;
 	}
 }
