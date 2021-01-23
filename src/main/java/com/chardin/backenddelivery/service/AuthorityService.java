@@ -2,11 +2,8 @@ package com.chardin.backenddelivery.service;
 
 import com.chardin.backenddelivery.converter.DtoEntity;
 import com.chardin.backenddelivery.dto.AuthorityDto;
-import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.entity.Authority;
-import com.chardin.backenddelivery.entity.User;
 import com.chardin.backenddelivery.exception.ResourceNotFoundException;
-import com.chardin.backenddelivery.exception.ValidationResponse;
 import com.chardin.backenddelivery.repository.AuthorityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +35,7 @@ public class AuthorityService implements IAuthorityService {
 		if (authorityRepository.existsByName(authorityDto.getName()))
 			return responseBadRequest();
 
-		authorityRepository.save(dtoEntity.getRol(authorityDto));
+		authorityRepository.save(dtoEntity.getAuthority(authorityDto));
 
 		return ResponseEntity.ok(authorityDto);
 	}
@@ -54,7 +51,7 @@ public class AuthorityService implements IAuthorityService {
 
 		authorityDto.setId(id);
 
-		authorityRepository.save(dtoEntity.getRol(authorityDto));
+		authorityRepository.save(dtoEntity.getAuthority(authorityDto));
 
 		return ResponseEntity.ok(authorityDto);
 	}
@@ -76,7 +73,7 @@ public class AuthorityService implements IAuthorityService {
 	@Override
 	public List<AuthorityDto> getByUser_Username(String username) {
 
-		 return dtoEntity.getRolsDto(authorityRepository.findByUsers_Username(username));
+		 return dtoEntity.getAuthoritiesDto(authorityRepository.findByUsers_Username(username));
 	}
 
 	@Override
@@ -85,7 +82,7 @@ public class AuthorityService implements IAuthorityService {
 		return authorityRepository.findAll(pageable)
 				.getContent()
 				.stream()
-				.map(r -> dtoEntity.getRolDto(r))
+				.map(r -> dtoEntity.getAuthorityDto(r))
 				.collect(Collectors.toList());
 	}
 
