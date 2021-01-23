@@ -1,8 +1,10 @@
 package com.chardin.backenddelivery.converter;
 
 import com.chardin.backenddelivery.dto.AuthorityDto;
+import com.chardin.backenddelivery.dto.OrderDto;
 import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.entity.Authority;
+import com.chardin.backenddelivery.entity.Order;
 import com.chardin.backenddelivery.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,17 +41,17 @@ public class DtoEntity {
 	}
 
 	//Rol-RolDto
-	public AuthorityDto getRolDto(Authority authorities) {
+	public AuthorityDto getAuthorityDto(Authority authority) {
 
-		return authorities != null ? modelmapper.map(authorities, AuthorityDto.class) : null;
+		return authority != null ? modelmapper.map(authority, AuthorityDto.class) : null;
 	}
 
-	public Authority getRol(AuthorityDto authorityDto) {
+	public Authority getAuthority(AuthorityDto authorityDto) {
 
 		return authorityDto != null ? modelmapper.map(authorityDto, Authority.class) : null;
 	}
 
-	public List<AuthorityDto> getRolsDto(List<Authority> authorities) {
+	public List<AuthorityDto> getAuthoritiesDto(List<Authority> authorities) {
 
 		return authorities
 				.stream()
@@ -57,11 +59,38 @@ public class DtoEntity {
 				.collect(Collectors.toList());
 	}
 
-	public List<Authority> getRols(List<AuthorityDto> rolsDto) {
+	public List<Authority> getAuthorities(List<AuthorityDto> authoritiesDto) {
 
-		return rolsDto
+		return authoritiesDto
 				.stream()
 				.map(r -> modelmapper.map(r, Authority.class))
+				.collect(Collectors.toList());
+	}
+	
+	//Order
+	public OrderDto getOrderDto(Order order) {
+
+		return order != null ? modelmapper.map(order, OrderDto.class) : null;
+	}
+
+	public Order getOrder(OrderDto orderDto) {
+
+		return orderDto != null ? modelmapper.map(orderDto, Order.class) : null;
+	}
+
+	public List<OrderDto> getOrdersDto(List<Order> orders) {
+
+		return orders
+				.stream()
+				.map(r -> modelmapper.map(r, OrderDto.class))
+				.collect(Collectors.toList());
+	}
+
+	public List<Order> getOrders(List<OrderDto> ordersDto) {
+
+		return ordersDto
+				.stream()
+				.map(r -> modelmapper.map(r, Order.class))
 				.collect(Collectors.toList());
 	}
 }
