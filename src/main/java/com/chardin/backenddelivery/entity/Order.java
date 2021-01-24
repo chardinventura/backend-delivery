@@ -21,6 +21,8 @@ public class Order {
     @OneToMany(cascade = CascadeType.ALL,
     mappedBy = "order")
     private List<Product> products;
+    @ManyToOne
+    private User user;
 
     public Order() {
     }
@@ -31,6 +33,14 @@ public class Order {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public LocalDateTime getOrderTime() {
@@ -63,5 +73,13 @@ public class Order {
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
