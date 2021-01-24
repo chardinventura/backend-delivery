@@ -2,6 +2,7 @@ package com.chardin.backenddelivery.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -26,6 +27,8 @@ public class User implements Serializable {
 	private String email;
 	@Column(nullable = false)
 	private String password;
+	@OneToMany(mappedBy = "user")
+	private List<Order> orders;
 
 	public User() {
 	}
@@ -76,5 +79,11 @@ public class User implements Serializable {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public List<Order> getOrders() {
+		return orders;
+	}
+	public void setOrders(List<Order> orders) {
+		this.orders = orders;
 	}
 }
