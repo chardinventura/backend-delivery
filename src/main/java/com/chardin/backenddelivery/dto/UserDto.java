@@ -26,6 +26,7 @@ public class UserDto implements Serializable {
 	@NotBlank
 	private String email;
 	@Size(min = 8)
+	@NotBlank
 	private String password;
 
 	public UserDto() {
