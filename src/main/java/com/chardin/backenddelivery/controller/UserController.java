@@ -4,7 +4,7 @@ import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,13 +19,15 @@ public class UserController {
 	private IUserService userService;
 
 	@PostMapping
-	public ResponseEntity insert(@Valid @RequestBody UserDto userDto) {
-		return userService.insert(userDto);
+	public Map<String, Boolean> insert(@Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
+		return userService.insert(userDto, bindingResult);
 	}
 
 	@PutMapping(path = "/{id}")
-	public ResponseEntity update(@Valid @PathVariable("id") Long id, @RequestBody UserDto userDto) {
-		return userService.update(id, userDto);
+	public UserDto update(@Valid @PathVariable("id") Long id,
+						  @RequestBody UserDto userDto,
+						  BindingResult bindingResult) {
+		return userService.update(id, userDto, bindingResult);
 	}
 
 	@DeleteMapping(path = "/{id}")
@@ -34,7 +36,7 @@ public class UserController {
 	}
 
 	@GetMapping(path = "/{id}")
-	public ResponseEntity getById(@PathVariable("id") Long id) {
+	public UserDto getById(@PathVariable("id") Long id) {
 		return userService.getById(id);
 	}
 
