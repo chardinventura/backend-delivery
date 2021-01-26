@@ -1,5 +1,7 @@
 package com.chardin.backenddelivery.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
@@ -18,7 +20,9 @@ public class OrderDto implements Serializable {
     private Float totalPrice;
     @NotBlank
     private String address;
-    private List<ProductDto> productsDto;
+    @JsonIgnoreProperties("order")
+    private List<ProductDto> products;
+    private UserDto userDto;
 
     public OrderDto() {
     }
@@ -63,11 +67,19 @@ public class OrderDto implements Serializable {
         this.address = address;
     }
 
-    public List<ProductDto> getProductsDto() {
-        return productsDto;
+    public List<ProductDto> getProducts() {
+        return products;
     }
 
-    public void setProductsDto(List<ProductDto> productsDto) {
-        this.productsDto = productsDto;
+    public void setProducts(List<ProductDto> products) {
+        this.products = products;
+    }
+
+    public UserDto getUserDto() {
+        return userDto;
+    }
+
+    public void setUserDto(UserDto userDto) {
+        this.userDto = userDto;
     }
 }
