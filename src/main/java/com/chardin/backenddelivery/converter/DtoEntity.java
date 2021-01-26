@@ -2,9 +2,11 @@ package com.chardin.backenddelivery.converter;
 
 import com.chardin.backenddelivery.dto.AuthorityDto;
 import com.chardin.backenddelivery.dto.OrderDto;
+import com.chardin.backenddelivery.dto.ProductDto;
 import com.chardin.backenddelivery.dto.UserDto;
 import com.chardin.backenddelivery.entity.Authority;
 import com.chardin.backenddelivery.entity.Order;
+import com.chardin.backenddelivery.entity.Product;
 import com.chardin.backenddelivery.entity.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +93,33 @@ public class DtoEntity {
 		return ordersDto
 				.stream()
 				.map(r -> modelmapper.map(r, Order.class))
+				.collect(Collectors.toList());
+	}
+
+	//Product
+	public ProductDto getProductDto(Product product) {
+
+		return product != null ? modelmapper.map(product, ProductDto.class) : null;
+	}
+
+	public Product getProduct(ProductDto productDto) {
+
+		return productDto != null ? modelmapper.map(productDto, Product.class) : null;
+	}
+
+	public List<ProductDto> getProductsDto(List<Product> products) {
+
+		return products
+				.stream()
+				.map(r -> modelmapper.map(r, ProductDto.class))
+				.collect(Collectors.toList());
+	}
+
+	public List<Product> getProducts(List<ProductDto> productsDto) {
+
+		return productsDto
+				.stream()
+				.map(r -> modelmapper.map(r, Product.class))
 				.collect(Collectors.toList());
 	}
 }
