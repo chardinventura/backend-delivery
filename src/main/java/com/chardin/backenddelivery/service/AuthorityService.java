@@ -63,10 +63,7 @@ public class AuthorityService implements IAuthorityService {
 
 		authorityRepository.deleteById(id);
 
-		Map<String, Boolean> response = new HashMap<>();
-		response.put("deleted", Boolean.TRUE);
-
-		return response;
+		return Map.of("deleted", Boolean.TRUE);
 	}
 
 	@Override
