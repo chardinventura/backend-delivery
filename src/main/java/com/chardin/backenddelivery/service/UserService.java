@@ -112,7 +112,7 @@ public class UserService implements IUserService {
 				.getContent());
 	}
 
-	private boolean isValidUserToInsert(UserDto userDto, BindingResult bindingResult) throws ValidationException {
+	private boolean isValidUserToInsert(UserDto userDto, BindingResult bindingResult) {
 
 		if (!bindingResult.hasFieldErrors("username") && userRepository.existsByUsername(userDto.getUsername()))
 			bindingResult.rejectValue("username", "error.user", "Username already exists");
@@ -126,7 +126,7 @@ public class UserService implements IUserService {
 		return !bindingResult.hasFieldErrors();
 	}
 
-	private boolean isValidUserToUpdate(User user, UserDto userDto, BindingResult bindingResult) throws ValidationException {
+	private boolean isValidUserToUpdate(User user, UserDto userDto, BindingResult bindingResult) {
 
 		if (!user.getUsername().equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername()))
 			bindingResult.rejectValue("username", "error.user", "Username already exists");
