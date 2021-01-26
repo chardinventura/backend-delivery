@@ -4,16 +4,15 @@ import com.chardin.backenddelivery.converter.DtoEntity;
 import com.chardin.backenddelivery.dto.AuthorityDto;
 import com.chardin.backenddelivery.entity.Authority;
 import com.chardin.backenddelivery.exception.ResourceNotFoundException;
+import com.chardin.backenddelivery.exception.ValidationException;
 import com.chardin.backenddelivery.repository.AuthorityRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,30 +29,30 @@ public class AuthorityService implements IAuthorityService {
 	private static final Logger LOG = LoggerFactory.getLogger(AuthorityService.class);
 
 	@Override
-	public ResponseEntity insert(AuthorityDto authorityDto) {
+	public Map<String, Boolean> insert(AuthorityDto authorityDto, BindingResult bindingResult) {
 
-		if (authorityRepository.existsByName(authorityDto.getName()))
-			return responseBadRequest();
+		if (!isValidAuthorityToInsert(authorityDto, bindingResult))
+			throw new ValidationException(bindingResult);
 
 		authorityRepository.save(dtoEntity.getAuthority(authorityDto));
 
-		return ResponseEntity.ok(authorityDto);
+		return Map.of("inserted", Boolean.TRUE);
 	}
 
 	@Override
-	public ResponseEntity update(Long id, AuthorityDto authorityDto) {
+	public AuthorityDto update(Long id, AuthorityDto authorityDto, BindingResult bindingResult) {
 
 		Authority authority = authorityRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Authority id not found :: " + id));
 
-		if (!authority.getName().equals(authorityDto.getName()) && authorityRepository.existsByName(authorityDto.getName()))
-			return responseBadRequest();
+		if (!isValidAuthorityToUpdate(authority, authorityDto, bindingResult))
+			throw new ValidationException(bindingResult);
 
 		authorityDto.setId(id);
 
 		authorityRepository.save(dtoEntity.getAuthority(authorityDto));
 
-		return ResponseEntity.ok(authorityDto);
+		return authorityDto;
 	}
 
 	@Override
@@ -86,17 +85,19 @@ public class AuthorityService implements IAuthorityService {
 				.collect(Collectors.toList());
 	}
 
-	private ResponseEntity responseBadRequest(){
+	private boolean isValidAuthorityToInsert(AuthorityDto authorityDto, BindingResult bindingResult){
 
-		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		if (!bindingResult.hasFieldErrors("name") && authorityRepository.existsByName(authorityDto.getName()))
+			bindingResult.rejectValue("name", "error.authority", "Name already exists");
 
-		Map<String, Object> body = new HashMap<>();
-		body.put("message", httpStatus.getReasonPhrase());
-		body.put("status", httpStatus.value());
-		body.put("timeStamp", LocalDateTime.now());
+		return !bindingResult.hasFieldErrors();
+	}
 
-		body.put("error", "Name already exists");
+	private boolean isValidAuthorityToUpdate(Authority authority, AuthorityDto authorityDto, BindingResult bindingResult){
 
-		return new ResponseEntity(body, httpStatus);
+		if (!bindingResult.hasFieldErrors("name") && !authority.getName().equals(authorityDto.getName()) && authorityRepository.existsByName(authorityDto.getName()))
+			bindingResult.rejectValue("name", "error.authority", "Name already exists");
+
+		return !bindingResult.hasFieldErrors();
 	}
 }

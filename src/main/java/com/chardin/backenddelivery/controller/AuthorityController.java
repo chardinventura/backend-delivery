@@ -4,7 +4,7 @@ import com.chardin.backenddelivery.dto.AuthorityDto;
 import com.chardin.backenddelivery.service.IAuthorityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,17 +19,19 @@ public class AuthorityController {
 	private IAuthorityService authorityService;
 
 	@PostMapping
-	public ResponseEntity insert(@Valid @RequestBody AuthorityDto authorityDto) {
-		return authorityService.insert(authorityDto);
+	public Map<String, Boolean> insert(@Valid @RequestBody AuthorityDto authorityDto, BindingResult bindingResult) {
+		return authorityService.insert(authorityDto, bindingResult);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity update(@PathVariable("id") Long id, @Valid @RequestBody AuthorityDto authorityDto) {
-		return authorityService.update(id, authorityDto);
+	public AuthorityDto update(@PathVariable("id") Long id,
+								 @Valid @RequestBody AuthorityDto authorityDto,
+								 BindingResult bindingResult) {
+		return authorityService.update(id, authorityDto, bindingResult);
 	}
 
 	@DeleteMapping(path = "/{id}")
-	public Map<String, Boolean> update(@PathVariable("id") Long id) {
+	public Map<String, Boolean> delete(@PathVariable("id") Long id) {
 		return authorityService.delete(id);
 	}
 
