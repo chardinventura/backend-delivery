@@ -6,6 +6,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.List;
 
 public class UserDto implements Serializable {
 
@@ -28,6 +29,7 @@ public class UserDto implements Serializable {
 	@Size(min = 8)
 	@NotBlank
 	private String password;
+	private List<OrderDto> orders;
 
 	public UserDto() {
 	}
@@ -79,5 +81,11 @@ public class UserDto implements Serializable {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public List<OrderDto> getOrders() {
+		return orders;
+	}
+	public void setOrders(List<OrderDto> orders) {
+		this.orders = orders;
 	}
 }
