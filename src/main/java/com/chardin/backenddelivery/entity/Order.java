@@ -1,5 +1,7 @@
 package com.chardin.backenddelivery.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,8 +20,7 @@ public class Order {
     private LocalDateTime orderTime;
     private Float totalPrice;
     private String address;
-    @OneToMany(cascade = CascadeType.ALL,
-    mappedBy = "order")
+    @OneToMany(mappedBy = "order")
     private List<Product> products;
     @ManyToOne
     private User user;
