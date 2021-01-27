@@ -1,5 +1,7 @@
 package com.chardin.backenddelivery.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 import java.util.List;
@@ -11,6 +13,7 @@ public class AuthorityDto implements Serializable {
 	private Long id;
 	@NotBlank
 	private String name;
+	@JsonIgnoreProperties("authorities")
 	private List<UserDto> users;
 
 	public AuthorityDto() {

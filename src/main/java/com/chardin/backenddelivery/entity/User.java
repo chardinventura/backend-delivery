@@ -27,6 +27,8 @@ public class User implements Serializable {
 	private String email;
 	@Column(nullable = false)
 	private String password;
+	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
+	private List<Authority> authorities;
 	@OneToMany(mappedBy = "user")
 	private List<Order> orders;
 
@@ -85,5 +87,11 @@ public class User implements Serializable {
 	}
 	public void setOrders(List<Order> orders) {
 		this.orders = orders;
+	}
+	public List<Authority> getAuthorities() {
+		return authorities;
+	}
+	public void setAuthorities(List<Authority> authorities) {
+		this.authorities = authorities;
 	}
 }

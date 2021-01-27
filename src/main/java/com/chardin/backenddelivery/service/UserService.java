@@ -43,7 +43,7 @@ public class UserService implements IUserService {
 		User user = userRepository.findByUsername(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User name not found on :: " + username));
 
-		List<GrantedAuthority> authorities = authorityRepository.findByUsers_Username(username)
+		List<GrantedAuthority> authorities = user.getAuthorities()
 				.stream()
 				.map(a -> new SimpleGrantedAuthority(a.getName()))
 				.collect(Collectors.toList());
@@ -78,6 +78,7 @@ public class UserService implements IUserService {
 
 		userDto.setId(id);
 		userDto.setPassword(passwordEncoded);
+		userDto.setAuthorities(dtoEntity.getAuthoritiesDto(user.getAuthorities()));
 
 		userRepository.save(dtoEntity.getUser(userDto));
 

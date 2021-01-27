@@ -1,5 +1,6 @@
 package com.chardin.backenddelivery.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.validator.constraints.Range;
 
 import javax.validation.constraints.Email;
@@ -8,6 +9,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
+@JsonIgnoreProperties(value = "authorities", allowGetters = true)
 public class UserDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -29,6 +31,8 @@ public class UserDto implements Serializable {
 	@Size(min = 8)
 	@NotBlank
 	private String password;
+	@JsonIgnoreProperties("users")
+	private List<AuthorityDto> authorities;
 	private List<OrderDto> orders;
 
 	public UserDto() {
@@ -81,6 +85,12 @@ public class UserDto implements Serializable {
 	}
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	public List<AuthorityDto> getAuthorities() {
+		return authorities;
+	}
+	public void setAuthorities(List<AuthorityDto> authorities) {
+		this.authorities = authorities;
 	}
 	public List<OrderDto> getOrders() {
 		return orders;
