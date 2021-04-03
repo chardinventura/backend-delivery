@@ -1,9 +1,12 @@
 package com.chardin.backenddelivery.entity;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
@@ -23,75 +26,10 @@ public class User implements Serializable {
 	private String username;
 	@Column(nullable = false, unique = true)
 	private String phone;
-	@Column(nullable = false, unique = true)
-	private String email;
 	@Column(nullable = false)
 	private String password;
 	@ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
 	private List<Authority> authorities;
 	@OneToMany(mappedBy = "user")
 	private List<Order> orders;
-
-	public User() {
-	}
-
-	public Long getId() { return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public byte getAvatar() {
-		return avatar;
-	}
-	public void setAvatar(byte avatar) {
-		this.avatar = avatar;
-	}
-	public String getFirstname() {
-		return firstname;
-	}
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-	public String getLastname() {
-		return lastname;
-	}
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public String getPhone() {
-		return phone;
-	}
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public List<Order> getOrders() {
-		return orders;
-	}
-	public void setOrders(List<Order> orders) {
-		this.orders = orders;
-	}
-	public List<Authority> getAuthorities() {
-		return authorities;
-	}
-	public void setAuthorities(List<Authority> authorities) {
-		this.authorities = authorities;
-	}
 }
