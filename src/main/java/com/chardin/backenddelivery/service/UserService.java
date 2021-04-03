@@ -26,116 +26,122 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements IUserService {
 
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private AuthorityRepository authorityRepository;
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	@Autowired
-	private DtoEntity dtoEntity;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private AuthorityRepository authorityRepository;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private DtoEntity dtoEntity;
 
-	private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		User user = userRepository.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException("User name not found on :: " + username));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> {
+                    LOGGER.error("The user's username couldn't be found :: " + username);
+                    return new ResourceNotFoundException("The user's username couldn't be found :: " + username);
+                });
 
-		List<GrantedAuthority> authorities = user.getAuthorities()
-				.stream()
-				.map(a -> new SimpleGrantedAuthority(a.getName()))
-				.collect(Collectors.toList());
+        List<GrantedAuthority> authorities = user.getAuthorities()
+                .stream()
+                .map(a -> new SimpleGrantedAuthority(a.getName()))
+                .collect(Collectors.toList());
 
-		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
-	}
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+    }
 
-	@Override
-	public Map<String, Boolean> insert(UserDto userDto, BindingResult bindingResult) {
+    @Override
+    public Map<String, Boolean> insert(UserDto userDto, BindingResult bindingResult) {
 
-	    if (!isValidUserToInsert(userDto, bindingResult))
-	        throw new ValidationException(bindingResult);
+        if (!isValidUserToInsert(userDto, bindingResult)) {
+            LOGGER.error("The user isn't valid to be inserted :: " + userDto.toString());
+            throw new ValidationException(bindingResult);
+        }
 
-		userDto.setPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
-		userRepository.save(dtoEntity.getUser(userDto));
+        userRepository.save(dtoEntity.toEntity(userDto));
 
-		return Map.of("inserted", Boolean.TRUE);
-	}
+        return Map.of("inserted", Boolean.TRUE);
+    }
 
-	@Override
-	public UserDto update(Long id, UserDto userDto, BindingResult bindingResult) {
+    @Override
+    public UserDto update(Long id, UserDto userDto, BindingResult bindingResult) {
 
-		User user = userRepository.findById(id)
-				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    LOGGER.error("The user's id couldn't be found :: " + id);
+                    return new ResourceNotFoundException("The user's id couldn't be found :: " + id);
+                });
 
-		if (!isValidUserToUpdate(user, userDto, bindingResult))
-			throw new ValidationException(bindingResult);
+        if (!isValidUserToUpdate(user, userDto, bindingResult)) {
+            LOGGER.error("The user isn't valid to be updated :: " + id);
+            throw new ValidationException(bindingResult);
+        }
 
-		String passwordEncoded = bCryptPasswordEncoder.matches(userDto.getPassword(), user.getPassword()) ?
-				user.getPassword() : bCryptPasswordEncoder.encode(userDto.getPassword());
+        userDto.setId(id);
+        userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        userDto.setAuthorities(dtoEntity.toAuthoritiesDto(user.getAuthorities()));
 
-		userDto.setId(id);
-		userDto.setPassword(passwordEncoded);
-		userDto.setAuthorities(dtoEntity.getAuthoritiesDto(user.getAuthorities()));
+        userRepository.save(dtoEntity.toEntity(userDto));
 
-		userRepository.save(dtoEntity.getUser(userDto));
+        return userDto;
+    }
 
-		return userDto;
-	}
+    @Override
+    public Map<String, Boolean> delete(Long id) {
 
-	@Override
-	public Map<String, Boolean> delete(Long id)  {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    LOGGER.error("The user's id couldn't be found :: " + id);
+                    return new ResourceNotFoundException("The user's id couldn't be found :: " + id);
+                });
 
-		User user = userRepository.findById(id)
-				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
+        userRepository.delete(user);
 
-		userRepository.delete(user);
+        return Map.of("deleted", Boolean.TRUE);
+    }
 
-		return Map.of("deleted", Boolean.TRUE);
-	}
+    @Override
+    public UserDto getById(Long id) {
 
-	@Override
-	public UserDto getById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> {
+                    LOGGER.error("The user's id couldn't be found :: " + id);
+                    return new ResourceNotFoundException("The user's id couldn't be found :: " + id);
+                });
 
-		User user = userRepository.findById(id)
-				.orElseThrow(() ->  new ResourceNotFoundException("User id not found :: " + id));
+        return dtoEntity.toDto(user);
+    }
 
-		return dtoEntity.getUserDto(user);
-	}
+    @Override
+    public List<UserDto> getAll(Pageable pageable) {
+        return dtoEntity.toUsersDto(
+                userRepository.findAll(pageable)
+                .getContent());
+    }
 
-	@Override
-	public List<UserDto> getAll(Pageable pageable) {
+    private boolean isValidUserToInsert(UserDto userDto, BindingResult bindingResult) {
 
-		return dtoEntity.getUsersDto(userRepository
-				.findAll(pageable)
-				.getContent());
-	}
+        if (userRepository.existsByUsername(userDto.getUsername()))
+            bindingResult.rejectValue("username", "error.user", "Username already exists");
+        if (userRepository.existsByPhone(userDto.getPhone()))
+            bindingResult.rejectValue("phone", "error.user", "Phone already exists");
 
-	private boolean isValidUserToInsert(UserDto userDto, BindingResult bindingResult) {
+        return !bindingResult.hasFieldErrors();
+    }
 
-		if (!bindingResult.hasFieldErrors("username") && userRepository.existsByUsername(userDto.getUsername()))
-			bindingResult.rejectValue("username", "error.user", "Username already exists");
+    private boolean isValidUserToUpdate(User user, UserDto userDto, BindingResult bindingResult) {
 
-		if (!bindingResult.hasFieldErrors("email") && userRepository.existsByEmail(userDto.getEmail()))
-			bindingResult.rejectValue("email", "error.user", "Email already exists");
+        if (!user.getUsername().equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername()))
+            bindingResult.rejectValue("username", "error.user", "Username already exists");
+        if (!user.getPhone().equals(userDto.getPhone()) && userRepository.existsByPhone(userDto.getPhone()))
+            bindingResult.rejectValue("phone", "error.user", "Phone already exists");
 
-		if (!bindingResult.hasFieldErrors("phone") && userRepository.existsByPhone(userDto.getPhone()))
-			bindingResult.rejectValue("phone", "error.user", "Phone already exists");
-
-		return !bindingResult.hasFieldErrors();
-	}
-
-	private boolean isValidUserToUpdate(User user, UserDto userDto, BindingResult bindingResult) {
-
-		if (!user.getUsername().equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername()))
-			bindingResult.rejectValue("username", "error.user", "Username already exists");
-		if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail()))
-			bindingResult.rejectValue("email", "error.user", "Email already exists");
-		if (!user.getPhone().equals(userDto.getPhone()) && userRepository.existsByPhone(userDto.getPhone()))
-			bindingResult.rejectValue("phone", "error.user", "Phone already exists");
-
-		return !bindingResult.hasFieldErrors();
-	}
+        return !bindingResult.hasFieldErrors();
+    }
 }
