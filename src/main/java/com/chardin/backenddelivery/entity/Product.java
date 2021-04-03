@@ -1,9 +1,12 @@
 package com.chardin.backenddelivery.entity;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name = "products")
 public class Product implements Serializable {
@@ -17,34 +20,5 @@ public class Product implements Serializable {
 	private String name;
 	private float price;
 	@ManyToOne
-    //@JoinColumn(name = "order_id", nullable = false)
 	private Order order;
-
-	public Product() {
-	}
-
-	public long getId() {
-		return id;
-	}
-	public void setId(long id) {
-		this.id = id;
-	}
-	public float getPrice() {
-		return price;
-	}
-	public void setPrice(float price) {
-		this.price = price;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public Order getOrder() {
-		return order;
-	}
-	public void setOrder(Order order) {
-		this.order = order;
-	}
 }
