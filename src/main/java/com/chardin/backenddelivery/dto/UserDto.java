@@ -1,15 +1,19 @@
 package com.chardin.backenddelivery.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.ToString;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
-@JsonIgnoreProperties(value = "authorities", allowGetters = true)
+@Data
+@ToString(exclude = {"id", "password"})
 public class UserDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -25,77 +29,18 @@ public class UserDto implements Serializable {
 	private String username;
 	@NotBlank
 	private String phone;
-	@Email
-	@NotBlank
-	private String email;
 	@Size(min = 8)
 	@NotBlank
 	private String password;
 	@JsonIgnoreProperties("users")
 	private List<AuthorityDto> authorities;
-	private List<OrderDto> orders;
 
-	public UserDto() {
-	}
-
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public byte getAvatar() {
-		return avatar;
-	}
-	public void setAvatar(byte avatar) {
-		this.avatar = avatar;
-	}
-	public String getFirstname() {
-		return firstname;
-	}
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-	public String getLastname() {
-		return lastname;
-	}
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
-	public String getUsername() {
-		return username;
-	}
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	public String getPhone() {
-		return phone;
-	}
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
+	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;
-	}
-	public List<AuthorityDto> getAuthorities() {
-		return authorities;
-	}
-	public void setAuthorities(List<AuthorityDto> authorities) {
-		this.authorities = authorities;
-	}
-	public List<OrderDto> getOrders() {
-		return orders;
-	}
-	public void setOrders(List<OrderDto> orders) {
-		this.orders = orders;
 	}
 }
