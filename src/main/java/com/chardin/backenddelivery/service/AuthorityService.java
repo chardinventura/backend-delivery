@@ -34,7 +34,7 @@ public class AuthorityService implements IAuthorityService {
 		if (!isValidAuthorityToInsert(authorityDto, bindingResult))
 			throw new ValidationException(bindingResult);
 
-		authorityRepository.save(dtoEntity.getAuthority(authorityDto));
+		authorityRepository.save(dtoEntity.toEntity(authorityDto));
 
 		return Map.of("inserted", Boolean.TRUE);
 	}
@@ -50,7 +50,7 @@ public class AuthorityService implements IAuthorityService {
 
 		authorityDto.setId(id);
 
-		authorityRepository.save(dtoEntity.getAuthority(authorityDto));
+		authorityRepository.save(dtoEntity.toEntity(authorityDto));
 
 		return authorityDto;
 	}
@@ -68,18 +68,14 @@ public class AuthorityService implements IAuthorityService {
 
 	@Override
 	public List<AuthorityDto> getByUser_Username(String username) {
-
-		 return dtoEntity.getAuthoritiesDto(authorityRepository.findByUsers_Username(username));
+		 return dtoEntity.toAuthoritiesDto(authorityRepository.findByUsers_Username(username));
 	}
 
 	@Override
 	public List<AuthorityDto> getAll(Pageable pageable) {
-
-		return authorityRepository.findAll(pageable)
-				.getContent()
-				.stream()
-				.map(r -> dtoEntity.getAuthorityDto(r))
-				.collect(Collectors.toList());
+		return dtoEntity.toAuthoritiesDto(
+				authorityRepository.findAll(pageable)
+				.getContent());
 	}
 
 	private boolean isValidAuthorityToInsert(AuthorityDto authorityDto, BindingResult bindingResult){
